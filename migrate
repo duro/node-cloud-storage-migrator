@@ -1,0 +1,49 @@
+#!/usr/bin/env node
+
+var fromClient, toClient, migrator,
+    Migrate = require('./lib/Migrate'),
+    async   = require('async'),
+    cli = require('commander');
+
+cli
+  .version('0.0.1')
+  .option('-f, --from <provider>', 'FROM: provider (rackspace, amazon)', String)
+  .option('-g --from-key-id <key>', 'FROM: provider\'s key ID', String)
+  .option('-h --from-key <key>', 'FROM: provider\'s key', String)
+  .option('-x --from-container <container>', 'FROM: container', String)
+  .option('-t --to <provider>', 'TO: provider (rackspace, amazon)', String)
+  .option('-y --to-key-id <key>', 'TO: provider\'s key ID', String)
+  .option('-u --to-key <key>', 'TO: provider\'s key', String)
+  .option('-c --to-container <container>', 'TO: container', String)
+  .option('-a --to-acl <value>', 'TO: Amazon ACL canned permission value', String, 'private')
+  .option('-p --to-protocol <value>', 'TO: the protocol to use for putting files. Options: http, https', String, 'http')
+  .option('-m --concurrency <value>', 'Number of concurrent migration tasks', Number, 2)
+  .option('-l --log-file <path>', 'path where log should be written', String)
+  .parse(process.argv);
+
+fromClient = require('pkgcloud').storage.createClient({
+  provider: cli.from,
+  username: cli.fromKeyId,
+  apiKey: cli.fromKey,
+  container: cli.fromContainer
+});
+
+toClient = require('pkgcloud').storage.createClient({
+  provider: cli.to,
+  keyId: cli.toKeyId,
+  key: cli.toKey,
+  container: cli.toContainer,
+  acl: cli.toAcl,
+  protocol: cli.toProtocol
+});
+
+migrator = new Migrate(fromClient, toClient, cli.concurrency, cli.logFile);
+
+async.waterfall(
+  [migrator.getFiles.bind(migrator)],
+  function(err){
+    if (err) return console.log(err);
+    console.log("Done!");
+  }
+);
+
