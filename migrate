@@ -34,7 +34,7 @@ toClient = require('pkgcloud').storage.createClient({
   key: cli.toKey,
   container: cli.toContainer,
   acl: cli.toAcl,
-  protocol: cli.toProtocol
+  protocol: cli.toProtocol + '://'
 });
 
 migrator = new Migrate(fromClient, toClient, cli.concurrency, cli.logFile);
