@@ -1,9 +1,28 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --debug-brk
 
-var fromClient, toClient, migrator,
+var fromClient, toClient,
     Migrate = require('./lib/Migrate'),
     async   = require('async'),
-    cli = require('commander');
+    cli = require('commander'),
+    init = function() {
+
+      fromClient = require('pkgcloud').storage.createClient({
+        provider: cli.from,
+        username: cli.fromKeyId,
+        apiKey: cli.fromKey,
+        container: cli.fromContainer
+      });
+
+      toClient = require('pkgcloud').storage.createClient({
+        provider: cli.to,
+        keyId: cli.toKeyId,
+        key: cli.toKey,
+        container: cli.toContainer,
+        acl: cli.toAcl,
+        protocol: cli.toProtocol + '://'
+      });
+
+    };
 
 cli
   .version('0.0.1')
@@ -18,32 +37,46 @@ cli
   .option('-a --to-acl <value>', 'TO: Amazon ACL canned permission value', String, 'private')
   .option('-p --to-protocol <value>', 'TO: the protocol to use for putting files. Options: http, https', String, 'http')
   .option('-m --concurrency <value>', 'Number of concurrent migration tasks', Number, 2)
-  .option('-l --log-file <path>', 'path where log should be written', String)
-  .parse(process.argv);
+  .option('-l --log-file <path>', 'path where log should be written', String);
 
-fromClient = require('pkgcloud').storage.createClient({
-  provider: cli.from,
-  username: cli.fromKeyId,
-  apiKey: cli.fromKey,
-  container: cli.fromContainer
-});
+cli
+  .command('run')
+  .description('Perform a complete migration')
+  .action(function(){
+    var migrator;
+    init();
+    migrator = new Migrate(fromClient, toClient, {
+      concurrency: cli.concurrency,
+      logFile: cli.logFile
+    });
+    async.waterfall(
+      [migrator.getFiles.bind(migrator)],
+      function(err){
+        if (err) return console.log(err);
+        console.log("Done!");
+      }
+    );
+  });
 
-toClient = require('pkgcloud').storage.createClient({
-  provider: cli.to,
-  keyId: cli.toKeyId,
-  key: cli.toKey,
-  container: cli.toContainer,
-  acl: cli.toAcl,
-  protocol: cli.toProtocol + '://'
-});
+cli
+  .command('test [count]')
+  .description('Run migration in test mode and only download a specific number of files')
+  .action(function(count){
+    var migrator;
+    init();
+    migrator = new Migrate(fromClient, toClient, {
+      concurrency: cli.concurrency,
+      logFile: cli.logFile,
+      testMode: true,
+      testSize: count
+    });
+    async.waterfall(
+      [migrator.getFiles.bind(migrator)],
+      function(err){
+        if (err) return console.log(err);
+        console.log("Done!");
+      }
+    );
+  });
 
-migrator = new Migrate(fromClient, toClient, cli.concurrency, cli.logFile);
-
-async.waterfall(
-  [migrator.getFiles.bind(migrator)],
-  function(err){
-    if (err) return console.log(err);
-    console.log("Done!");
-  }
-);
-
+cli.parse(process.argv);
