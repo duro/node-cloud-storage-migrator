@@ -1,4 +1,4 @@
-#!/usr/bin/env node --debug-brk
+#!/usr/bin/env node
 
 var fromClient, toClient,
     Migrate = require('./lib/Migrate'),
@@ -49,13 +49,10 @@ cli
       concurrency: cli.concurrency,
       logFile: cli.logFile
     });
-    async.waterfall(
-      [migrator.getFiles.bind(migrator)],
-      function(err){
-        if (err) return console.log(err);
-        console.log("Done!");
-      }
-    );
+    migrator.migrate(function(err){
+      if (err) return console.log(err);
+      console.log("Done!");
+    });
   });
 
 cli
@@ -70,13 +67,21 @@ cli
       testMode: true,
       testSize: count
     });
-    async.waterfall(
-      [migrator.getFiles.bind(migrator)],
-      function(err){
-        if (err) return console.log(err);
-        console.log("Done!");
-      }
-    );
+    migrator.migrate(function(err){
+      if (err) return console.log(err);
+      console.log("Done!");
+    });
+  });
+
+cli
+  .command('get-from-container')
+  .description('Retrieves the container from the source cloud storage')
+  .action(function(){
+    init();
+    fromClient.getContainer(cli.fromContainer, function(err, container){
+      if (err) return console.log(err);
+      console.log(container);
+    });
   });
 
 cli.parse(process.argv);
