@@ -10,7 +10,7 @@
     "commander": "~2.0.0",
     "pkgcloud": "~0.8.4",
     "async": "~0.2.9",
-    "progress": "git@github.com:rmanalan/node-progress.git#e7215a40430205794c392800cc5131c184c7a179"
+    "progress": "git@github.com:rmanalan/node-progress.git"
   },
   "devDependencies": {},
   "scripts": {
