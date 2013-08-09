@@ -37,7 +37,8 @@ cli
   .option('-a --to-acl <value>', 'TO: Amazon ACL canned permission value', String, 'private')
   .option('-p --to-protocol <value>', 'TO: the protocol to use for putting files. Options: http, https', String, 'http')
   .option('-m --concurrency <value>', 'Number of concurrent migration tasks', Number, 2)
-  .option('-l --log-file <path>', 'path where log should be written', String);
+  .option('-l --log-file <path>', 'path where log should be written', String)
+  .option('-d --dry-run', 'do a dry run without downloading or uploading anything');
 
 cli
   .command('run')
@@ -47,7 +48,8 @@ cli
     init();
     migrator = new Migrate(fromClient, toClient, {
       concurrency: cli.concurrency,
-      logFile: cli.logFile
+      logFile: cli.logFile,
+      dryRun: cli.dryRun
     });
     migrator.migrate(function(err){
       if (err) return console.log(err);
@@ -65,7 +67,8 @@ cli
       concurrency: cli.concurrency,
       logFile: cli.logFile,
       testMode: true,
-      testSize: count
+      testSize: count,
+      dryRun: cli.dryRun
     });
     migrator.migrate(function(err){
       if (err) return console.log(err);
