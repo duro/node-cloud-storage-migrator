@@ -3,11 +3,13 @@
   "version": "0.0.1",
   "description": "A script for migrating a cloudfiles container to an S3 bucket",
   "main": "migrate.js",
+  "notes" : {
+    "progress" : "Using a fork that fixes a problem with the progress bar display on OS X. This can be switched back if this pull request is merged: https://github.com/visionmedia/node-progress/pull/27"
+  },
   "dependencies": {
     "commander": "~2.0.0",
     "pkgcloud": "~0.8.4",
     "async": "~0.2.9",
-    // Using a fork that fixes a problem with the progress bar display on OS X. This can be switched back if this pull request is merged: https://github.com/visionmedia/node-progress/pull/27
     "progress": "git@github.com:rmanalan/node-progress.git#e7215a40430205794c392800cc5131c184c7a179"
   },
   "devDependencies": {},
