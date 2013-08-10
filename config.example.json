@@ -1,0 +1,23 @@
+{
+  "from" : {
+    "provider" : "",
+    "keyId" : "",
+    "key" : "",
+    "container" : ""
+  },
+  "to" : {
+    "provider" : "",
+    "keyId" : "",
+    "key" : "",
+    "container" : "",
+    "options" : {
+      "acl" : "",
+      "protocol" : ""
+    }
+  },
+  "options" : {
+    "concurrency" : 2,
+    "logFile" : "",
+    "dryRun" : false
+  }
+}
