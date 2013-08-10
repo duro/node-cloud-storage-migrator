@@ -49,7 +49,8 @@ cli
     migrator = new Migrate(fromClient, toClient, {
       concurrency: cli.concurrency,
       logFile: cli.logFile,
-      dryRun: cli.dryRun
+      dryRun: cli.dryRun,
+      cli: true
     });
     migrator.migrate(function(err){
       if (err) return console.log(err);
@@ -68,7 +69,8 @@ cli
       logFile: cli.logFile,
       testMode: true,
       testSize: count,
-      dryRun: cli.dryRun
+      dryRun: cli.dryRun,
+      cli: true
     });
     migrator.migrate(function(err){
       if (err) return console.log(err);
