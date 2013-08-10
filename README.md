@@ -5,7 +5,7 @@ Command Help
 ------------
 
 ```
-$ ./migrate --help
+$ ./bin/migrate --help
 
   Usage: migrate [options]
 
